@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Plastics from Rivers to Oceans</title>
+
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+<link href="https://api.mapbox.com/mapbox-gl-js/v3.10.0/mapbox-gl.css" rel="stylesheet">
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.10.0/mapbox-gl.js"></script>
+
+<style>
+    body { margin: 0; padding: 0; }
+    #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+    #title-container {
+        position: absolute;
+        top: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: white;
+        padding: 10px;
+        border-radius: 5px;
+        z-index: 1;
+        text-align: center;
+    }
+    #title {
+        font-family: Arial, sans-serif;
+        font-size: 20px;
+        font-weight: bold;
+        border: none;
+        text-align: center;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    #legend {
+        position: absolute;
+        bottom: 30px;
+        left: 10px;
+        background: white;
+        padding: 10px;
+        border-radius: 5px;
+        font-family: Arial, sans-serif;
+        z-index: 1;
+    }
+    .legend-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 5px;
+    }
+    .legend-color {
+        width: 20px;
+        height: 20px;
+        margin-right: 5px;
+        border-radius: 50%;
+    }
+</style>
+</head>
+<body>
+<div id="map"></div>
+<div id="title-container">
+    <input type="text" id="title" value="Plastics: Rivers to Oceans">
+</div>
+<div id="legend">
+        <div class="legend-item"><div class="legend-color" style="background-color: hsl(125, 88%, 29%);"></div>Area</div>
+    <div class="legend-item"><div class="legend-color" style="background-color: #010607;"></div>MPW</div>
+    <div class="legend-item"><div class="legend-color" style="background-color: hsl(0, 97%, 58%);"></div>High</div>
+    <div class="legend-item"><div class="legend-color" style="background-color: hsl(44, 97%, 54%);"></div>Mid</div>
+    <div class="legend-item"><div class="legend-color" style="background-color: hsl(63, 94%, 57%);"></div>Low</div>
+</div>
+<script>
+    mapboxgl.accessToken = 'pk.eyJ1IjoiY2hhc2VpbmdlcnNvbGwiLCJhIjoiY203dzYxcGV3MDI5bTJub2VncjJ3dWEwNSJ9.yyTWOBR3alRtUNL_2ZZHSQ'; // Mapbox Access Token
+
+    var map = new mapboxgl.Map({
+        container: 'map', // container id
+        style: 'mapbox://styles/chaseingersoll/cm8o106zz002x01rd9ufrh0vt', 
+        center: [104.888535,11.562108], // starting position [lng, lat]
+        zoom: 4 // starting zoom
+    });
+
+    // Add zoom and rotation controls to the map.
+    map.addControl(new mapboxgl.NavigationControl());
+
+    // Add a popup to the map.
+    var popup = new mapboxgl.Popup({
+        closeButton: false,
+        closeOnClick: false
+    });
+
+    // Add data layer (example: markers) and popups
+    map.on('load', function () {
+        // Example layer with points
+        map.addLayer({
+            id: 'example-points',
+            type: 'circle',
+            source: {
+                type: 'geojson',
+                data: {
+                    type: 'FeatureCollection',
+                    features: [
+                        {
+                            type: 'Feature',
+                            geometry: {
+                                type: 'Point',
+                                coordinates: [121.766541, 12.881959]
+                            },
+                            properties: {
+                                title: 'Areas of Concern',
+                                description: 'cluster of high levels of plastic'
+                            }
+                        }
+                    ]
+                }
+            },
+            paint: {
+                'circle-radius': 100,
+                'circle-color': 'rgba(253, 14, 78, 0.41)'
+            }
+        });
+
+        // Add event listener for clicks on the points
+        map.on('click', 'example-points', function (e) {
+            var coordinates = e.features[0].geometry.coordinates.slice();
+            var description = e.features[0].properties.description;
+
+            // Ensure that if the map is zoomed out such that multiple
+            // copies of the feature are visible, the popup appears
+            // over the copy being pointed to.
+            while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+                coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+            }
+
+            // Populate the popup and set its coordinates
+            // based on the feature found.
+            popup.setLngLat(coordinates).setHTML(description).addTo(map);
+        });
+
+        // Change the cursor to a pointer when the mouse is over the points.
+        map.on('mouseenter', 'example-points', function () {
+            map.getCanvas().style.cursor = 'pointer';
+        });
+
+        // Change it back to a pointer when it leaves.
+        map.on('mouseleave', 'example-points', function () {
+            map.getCanvas().style.cursor = '';
+        });
+    });
+</script>
+
+</body>
+</html>
