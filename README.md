@@ -1,2 +1,2 @@
-# plasticsmidterm_ingersoll
+# chaseingersoll
 Midterm project 
