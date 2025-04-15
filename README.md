@@ -1,3 +1,3 @@
 # chaseingersoll
 Midterm project 
-https://chaseingersoll.github.io/plasticsmidterm_ingersoll/
+https://chaseingersoll.github.io/plasticsmidterm_ingersoll/test.html
